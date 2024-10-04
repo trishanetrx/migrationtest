@@ -1,0 +1,24 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: '13c571b7-a9ce-40a9-b746-f72f0aed1641'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      az maintenance configuration assignment create \
+        --resource-group test-rg \
+        --resource-type Microsoft.Compute/virtualMachines \
+        --resource newtestvm \
+        --provider-name Microsoft.Maintenance \
+        --configuration-assignment mytestmaintainence01
