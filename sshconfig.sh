@@ -1,45 +1,72 @@
-#!/bin/bash
+#!/usr/bin/expect
 
-# Log in to servera machine as the student user
-ssh student@servera << 'EOF1'
-  
-  # Switch to the production1 user
-  su - production1 << 'EOF2'
+# Define variables for passwords
+set root_password "student"
+set production_password "redhat"
 
-    # Generate SSH keys for production1 user (passphrase-less)
-    ssh-keygen -t rsa -b 3072 -f /home/production1/.ssh/id_rsa -N ""
+# Step 1: SSH into servera as student user
+spawn ssh student@servera
+expect "password:"
+send "$root_password\r"
+expect "$ "
 
-    # Send the public key to serverb machine
-    ssh-copy-id production1@serverb
+# Step 2: Switch to the production1 user
+send "su - production1\r"
+expect "Password:"
+send "$production_password\r"
+expect "$ "
 
-    # Test SSH key login to serverb machine
-    ssh production1@serverb << 'EOF3'
+# Step 3: Generate SSH keys (without passphrase)
+send "ssh-keygen -t rsa -b 3072 -f /home/production1/.ssh/id_rsa -N ''\r"
+expect "$ "
 
-      # Switch to root user on serverb
-      su - << 'EOF4'
+# Step 4: Copy public key to serverb (password for production1 will be prompted)
+send "ssh-copy-id production1@serverb\r"
+expect "password:"
+send "$production_password\r"
+expect "$ "
 
-        # Configure SSH to disable root login
-        sed -i 's/^#PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
+# Step 5: Test login to serverb using SSH keys
+send "ssh production1@serverb\r"
+expect "$ "
 
-        # Reload the sshd service
-        systemctl reload sshd
+# Step 6: Switch to root on serverb
+send "su -\r"
+expect "Password:"
+send "$root_password\r"
+expect "# "
 
-        # Disable password authentication for SSH
-        sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+# Step 7: Edit /etc/ssh/sshd_config to disable root login
+send "sed -i 's/^#\\?PermitRootLogin .*/PermitRootLogin no/' /etc/ssh/sshd_config\r"
+expect "# "
 
-        # Reload the sshd service
-        systemctl reload sshd
+# Step 8: Reload sshd service
+send "systemctl reload sshd\r"
+expect "# "
 
-        # Verify that PubkeyAuthentication is enabled
-        grep -q "^#PubkeyAuthentication yes" /etc/ssh/sshd_config && echo "PubkeyAuthentication is enabled by default"
+# Step 9: Edit /etc/ssh/sshd_config to disable password-based SSH login
+send "sed -i 's/^#\\?PasswordAuthentication .*/PasswordAuthentication no/' /etc/ssh/sshd_config\r"
+expect "# "
 
-      EOF4
-      exit
+# Step 10: Reload sshd service again
+send "systemctl reload sshd\r"
+expect "# "
 
-    EOF3
-    exit
+# Step 11: Exit root session on serverb
+send "exit\r"
+expect "$ "
 
-  EOF2
-  exit
+# Step 12: Test login to serverb as production2 (should fail)
+send "ssh production2@serverb\r"
+expect "$ "
 
-EOF1
+# Step 13: Test login to serverb as production1 (should succeed)
+send "ssh production1@serverb\r"
+expect "$ "
+
+# Step 14: Exit all sessions
+send "exit\r"
+expect "$ "
+
+send "exit\r"
+expect eof
