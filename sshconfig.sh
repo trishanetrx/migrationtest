@@ -1,9 +1,9 @@
 #!/usr/bin/expect
 
 # Define variables for passwords
-set root_password_serverb "redhat"  # Root password for serverb
-set root_password_workstation "student"  # Root password for workstation
-set production_password "redhat"  # Password for production1 user
+set root_password_serverb "redhat"  ;# Root password for serverb
+set root_password_workstation "student"  ;# Root password for workstation
+set production_password "redhat"  ;# Password for production1 user
 
 # Step 1: SSH into servera as student user (workstation root password)
 spawn ssh student@servera
@@ -39,7 +39,7 @@ expect "$ "
 send "ssh root@serverb\r"
 expect "password:"
 send "$root_password_serverb\r"
-expect "# "  ; # now as root on serverb
+expect "# "  ;# now as root on serverb
 
 # Step 8: Edit /etc/ssh/sshd_config to disable root login (executed as root)
 send "sed -i 's/^#\\?PermitRootLogin .*/PermitRootLogin no/' /etc/ssh/sshd_config\r"
