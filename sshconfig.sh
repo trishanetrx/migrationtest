@@ -21,20 +21,13 @@ send "ssh-keygen -t rsa -b 3072 -f /home/production1/.ssh/id_rsa -N ''\r"
 expect "$ "
 
 # Step 4: Copy public key to serverb (password for production1 will be prompted)
-send "ssh-copy-id production1@serverb\r"
-expect {
-    "Are you sure you want to continue connecting (yes/no)?" {
-        send "yes\r"
-        exp_continue
-    }
-    "password:" {
-        send "$production_password\r"
-    }
-}
+send "ssh-copy-id -o StrictHostKeyChecking=no production1@serverb\r"
+expect "password:"
+send "$production_password\r"
 expect "$ "
 
 # Step 5: Test login to serverb using SSH keys
-send "ssh production1@serverb\r"
+send "ssh -o StrictHostKeyChecking=no production1@serverb\r"
 expect "$ "
 
 # Step 6: Switch to root on serverb
@@ -64,11 +57,11 @@ send "exit\r"
 expect "$ "
 
 # Step 12: Test login to serverb as production2 (should fail)
-send "ssh production2@serverb\r"
+send "ssh -o StrictHostKeyChecking=no production2@serverb\r"
 expect "$ "
 
 # Step 13: Test login to serverb as production1 (should succeed)
-send "ssh production1@serverb\r"
+send "ssh -o StrictHostKeyChecking=no production1@serverb\r"
 expect "$ "
 
 # Step 14: Exit all sessions
