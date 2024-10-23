@@ -36,19 +36,19 @@ expect "Password:"
 send "$root_password\r"
 expect "# "
 
-# Step 7: Edit /etc/ssh/sshd_config to disable root login
+# Step 7: Edit /etc/ssh/sshd_config to disable root login (executed as root)
 send "sed -i 's/^#\\?PermitRootLogin .*/PermitRootLogin no/' /etc/ssh/sshd_config\r"
 expect "# "
 
-# Step 8: Reload sshd service
+# Step 8: Reload sshd service (executed as root)
 send "systemctl reload sshd\r"
 expect "# "
 
-# Step 9: Edit /etc/ssh/sshd_config to disable password-based SSH login
+# Step 9: Edit /etc/ssh/sshd_config to disable password-based SSH login (executed as root)
 send "sed -i 's/^#\\?PasswordAuthentication .*/PasswordAuthentication no/' /etc/ssh/sshd_config\r"
 expect "# "
 
-# Step 10: Reload sshd service again
+# Step 10: Reload sshd service again (executed as root)
 send "systemctl reload sshd\r"
 expect "# "
 
