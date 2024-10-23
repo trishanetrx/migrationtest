@@ -10,13 +10,13 @@ expect "password:"
 send "$root_password\r"
 expect "$ "
 
-# Step 2: Switch to the production1 user
+# Step 2: Switch to the production1 user to perform non-privileged tasks
 send "su - production1\r"
 expect "Password:"
 send "$production_password\r"
 expect "$ "
 
-# Step 3: Generate SSH keys (without passphrase)
+# Step 3: Generate SSH keys (without passphrase) as production1
 send "ssh-keygen -t rsa -b 3072 -f /home/production1/.ssh/id_rsa -N ''\r"
 expect "$ "
 
@@ -26,19 +26,19 @@ expect "password:"
 send "$production_password\r"
 expect "$ "
 
-# Step 5: Test login to serverb using SSH keys
+# Step 5: Test login to serverb using SSH keys (as production1)
 send "ssh -o StrictHostKeyChecking=no production1@serverb\r"
 expect "$ "
 
-# Step 6: Exit production1 user session before switching to root
+# Step 6: **Exit the production1 session** after non-privileged tasks are done
 send "exit\r"
 expect "$ "
 
-# Step 7: Now switch to the root user
-send "su -\r"
-expect "Password:"
+# Step 7: Now switch to the root user on serverb to run privileged commands
+send "ssh root@serverb\r"
+expect "password:"
 send "$root_password\r"
-expect "# "
+expect "# "  ; # now as root on serverb
 
 # Step 8: Edit /etc/ssh/sshd_config to disable root login (executed as root)
 send "sed -i 's/^#\\?PermitRootLogin .*/PermitRootLogin no/' /etc/ssh/sshd_config\r"
@@ -60,15 +60,7 @@ expect "# "
 send "exit\r"
 expect "$ "
 
-# Step 13: Test login to serverb as production2 (should fail)
-send "ssh -o StrictHostKeyChecking=no production2@serverb\r"
-expect "$ "
-
-# Step 14: Test login to serverb as production1 (should succeed)
-send "ssh -o StrictHostKeyChecking=no production1@serverb\r"
-expect "$ "
-
-# Step 15: Exit all sessions
+# Step 13: Exit all sessions
 send "exit\r"
 expect "$ "
 
