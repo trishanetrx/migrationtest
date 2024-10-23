@@ -30,41 +30,45 @@ expect "$ "
 send "ssh -o StrictHostKeyChecking=no production1@serverb\r"
 expect "$ "
 
-# Step 6: Switch to root on serverb
+# Step 6: Exit production1 user session before switching to root
+send "exit\r"
+expect "$ "
+
+# Step 7: Switch to root on serverb (as student user)
 send "su -\r"
 expect "Password:"
 send "$root_password\r"
 expect "# "
 
-# Step 7: Edit /etc/ssh/sshd_config to disable root login (executed as root)
+# Step 8: Edit /etc/ssh/sshd_config to disable root login (executed as root)
 send "sed -i 's/^#\\?PermitRootLogin .*/PermitRootLogin no/' /etc/ssh/sshd_config\r"
 expect "# "
 
-# Step 8: Reload sshd service (executed as root)
+# Step 9: Reload sshd service (executed as root)
 send "systemctl reload sshd\r"
 expect "# "
 
-# Step 9: Edit /etc/ssh/sshd_config to disable password-based SSH login (executed as root)
+# Step 10: Edit /etc/ssh/sshd_config to disable password-based SSH login (executed as root)
 send "sed -i 's/^#\\?PasswordAuthentication .*/PasswordAuthentication no/' /etc/ssh/sshd_config\r"
 expect "# "
 
-# Step 10: Reload sshd service again (executed as root)
+# Step 11: Reload sshd service again (executed as root)
 send "systemctl reload sshd\r"
 expect "# "
 
-# Step 11: Exit root session on serverb
+# Step 12: Exit root session on serverb
 send "exit\r"
 expect "$ "
 
-# Step 12: Test login to serverb as production2 (should fail)
+# Step 13: Test login to serverb as production2 (should fail)
 send "ssh -o StrictHostKeyChecking=no production2@serverb\r"
 expect "$ "
 
-# Step 13: Test login to serverb as production1 (should succeed)
+# Step 14: Test login to serverb as production1 (should succeed)
 send "ssh -o StrictHostKeyChecking=no production1@serverb\r"
 expect "$ "
 
-# Step 14: Exit all sessions
+# Step 15: Exit all sessions
 send "exit\r"
 expect "$ "
 
