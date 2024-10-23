@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Step 1: Switch to root user (assuming you are already logged in as student)
-sudo -i
 
 # Step 2: Create the static connection profile with provided network settings for eth0
 nmcli connection add con-name static type ethernet \
