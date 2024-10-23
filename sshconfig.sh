@@ -22,8 +22,15 @@ expect "$ "
 
 # Step 4: Copy public key to serverb (password for production1 will be prompted)
 send "ssh-copy-id production1@serverb\r"
-expect "password:"
-send "$production_password\r"
+expect {
+    "Are you sure you want to continue connecting (yes/no/[fingerprint])?" {
+        send "yes\r"
+        exp_continue
+    }
+    "password:" {
+        send "$production_password\r"
+    }
+}
 expect "$ "
 
 # Step 5: Test login to serverb using SSH keys
