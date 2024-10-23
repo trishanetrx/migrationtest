@@ -34,7 +34,7 @@ expect "$ "
 send "exit\r"
 expect "$ "
 
-# Step 7: Switch to root on serverb (as student user)
+# Step 7: Now switch to the root user
 send "su -\r"
 expect "Password:"
 send "$root_password\r"
