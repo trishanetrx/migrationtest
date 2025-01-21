@@ -1,6 +1,6 @@
 # Basic Test YAML
 app_config:
-  app_name: "TestApp"
+  app_name: "TestAppNew3"
   version: "1.0"
   environment: "development"
   debug: true
