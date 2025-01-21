@@ -1,0 +1,34 @@
+# Basic Test YAML
+app_config:
+  app_name: "TestApp"
+  version: "1.0"
+  environment: "development"
+  debug: true
+
+database:
+  host: "localhost"
+  port: 5432
+  username: "admin"
+  password: "password123"
+  name: "test_db"
+
+features:
+  - authentication
+  - logging
+  - analytics
+
+servers:
+  - name: "web-server-1"
+    ip: "192.168.1.1"
+    role: "frontend"
+  - name: "db-server-1"
+    ip: "192.168.1.2"
+    role: "database"
+
+logging:
+  level: "info"
+  file: "/var/log/testapp.log"
+  rotation:
+    enabled: true
+    max_size: "10MB"
+    backup_count: 5
