@@ -1,1 +1,53 @@
-dsada
+# Basic Test YAML
+app_config:
+  app_name: "TestAppNew3"
+  version: "1.0"
+  environment: "development"
+  debug: true
+
+database:
+  host: "localhost"
+  port: 5432
+  username: "admin"
+  password: "password123"
+  name: "test_db"
+
+features:
+  - authentication
+  - logging
+  - analytics
+
+servers:
+  - name: "web-server-1"
+    ip: "192.168.1.1"
+    role: "frontend"
+  - name: "db-server-1"
+    ip: "192.168.1.2"
+    role: "database"
+
+logging:
+  level: "info"
+  file: "/var/log/testapp.log"
+  rotation:
+    enabled: true
+    max_size: "10MB"
+    backup_count: 5
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v1
+
+      - name: Build Application
+        run: |
+          echo "Building application..."
+          mkdir -p build
+          echo "Test build content" > build/output.tar.gz
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: build-artifact
+          path: build/output.tar.gz
