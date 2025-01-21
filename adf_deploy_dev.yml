@@ -47,7 +47,7 @@ jobs:
           echo "Test build content" > build/output.tar.gz
 
       - name: Upload Build Artifact
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: build-artifact
           path: build/output.tar.gz
