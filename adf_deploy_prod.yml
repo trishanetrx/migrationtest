@@ -5,6 +5,12 @@ app_config:
   environment: "development"
   debug: true
 
+ - name: Upload Build Artifact
+     uses: actions/upload-artifact@v1
+      with:
+        name: build-artifact
+        path: build/output.tar.gz
+
 database:
   host: "localhost"
   port: 5432
