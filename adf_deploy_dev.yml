@@ -20,7 +20,7 @@ jobs:
 
       # Upload artifact - old version (needs update)
       - name: upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ExportedArmTemplate
           path: ${{ github.workspace }}/azure/adf/ExportedArmTemplate
@@ -32,7 +32,7 @@ jobs:
     steps:
       # Download previously uploaded artifact - old version (needs update)
       - name: Download a Build Artifact
-        uses: actions/download-artifact@v3.0.2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: ExportedArmTemplate
 
