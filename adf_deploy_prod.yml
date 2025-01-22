@@ -1,59 +1,42 @@
-# Basic Test YAML
-app_config:
-  app_name: "TestAppNew3"
-  version: "1.0"
-  environment: "development"
-  debug: true
+name: Deploy ADF to Dev Environment
 
- - name: Upload Build Artifact
-     uses: actions/upload-artifact@v1
-      with:
-        name: build-artifact
-        path: build/output.tar.gz
-
-database:
-  host: "localhost"
-  port: 5432
-  username: "admin"
-  password: "password123"
-  name: "test_db"
-
-features:
-  - authentication
-  - logging
-  - analytics
-
-servers:
-  - name: "web-server-1"
-    ip: "192.168.1.1"
-    role: "frontend"
-  - name: "db-server-1"
-    ip: "192.168.1.2"
-    role: "database"
-
-logging:
-  level: "info"
-  file: "/var/log/testapp.log"
-  rotation:
-    enabled: true
-    max_size: "10MB"
-    backup_count: 5
+on:
+  push:
+    branches:
+      - dev
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v1
+      - name: Validate and Generate ARM template
+        run: npm run build export ${{ github.workspace }}/azure/adf/subscriptions/adf-dev
+        working-directory: ${{ github.workspace }}/azure/adf
 
-      - name: Build Application
-        run: |
-          echo "Building application..."
-          mkdir -p build
-          echo "Test build content" > build/output.tar.gz
+      - name: Run Update Triggers
+        shell: pwsh
+        run: ./cicd/adf_dev_update_trigger.ps1 ${{ github.workspace }}/azure/adf/ExportedArmTemplate.json
 
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v1
+      # Upload artifact - old version (needs update)
+      - name: upload artifact
+        uses: actions/upload-artifact@v3
         with:
-          name: build-artifact
-          path: build/output.tar.gz
+          name: ExportedArmTemplate
+          path: ${{ github.workspace }}/azure/adf/ExportedArmTemplate
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Download previously uploaded artifact - old version (needs update)
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v3.0.2
+        with:
+          name: ExportedArmTemplate
+
+      - name: Login via Az module
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_NONPROD_CLIENT_ID }}
